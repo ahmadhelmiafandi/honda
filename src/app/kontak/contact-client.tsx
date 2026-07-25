@@ -136,36 +136,40 @@ export default function ContactClient({ settings }: ContactClientProps) {
                 >
                     {/* Sidebar Info */}
                     <div className="lg:col-span-1 space-y-8">
-                        <div className="bg-white p-10 rounded-2xl border border-slate-100 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] space-y-12">
+                        <div className="bg-white p-6 md:p-10 rounded-2xl border border-slate-100 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] space-y-8">
                             {/* Representative */}
-                            <div className="flex gap-6 items-center">
-                                <div className="h-20 w-20 rounded-xl bg-slate-950 flex items-center justify-center shrink-0 shadow-xl overflow-hidden relative">
+                            <div className="flex gap-4 items-center">
+                                <div className="h-16 w-16 md:h-20 md:w-20 rounded-xl bg-slate-950 flex items-center justify-center shrink-0 shadow-xl overflow-hidden relative">
                                     {contactPhoto ? (
                                         <Image src={contactPhoto} alt={contactName} fill className="object-cover" />
                                     ) : (
                                         <User className="h-8 w-8 text-white" />
                                     )}
                                 </div>
-                                <div>
+                                <div className="min-w-0">
                                     <p className="text-[10px] font-bold text-red-600 uppercase tracking-[0.2em] mb-1">{contactBadge}</p>
-                                    <p className="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">{contactName}</p>
+                                    <p className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none">{contactName}</p>
                                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">{contactTitle}</p>
                                 </div>
                             </div>
 
-                            <div className="space-y-10">
+                            <div className="space-y-6">
                                 {[
-                                    { icon: Phone, label: "Direct Call", val: whatsappNumber, color: "text-slate-900 hover:text-red-600", bg: "bg-slate-50", action: () => window.open(`tel:${cleanPhoneNumber(whatsappNumber)}`) },
-                                    { icon: Mail, label: "Official Email", val: email, color: "text-slate-900 hover:text-red-600", bg: "bg-slate-50", action: () => window.open(`mailto:${email}`) },
-                                    { icon: MessageCircle, label: "Live WhatsApp", val: "Chat Now", color: "text-green-600 hover:text-green-700", bg: "bg-green-50/50", action: handleInstantWhatsApp }
+                                    { icon: Phone, label: "Direct Call", val: whatsappNumber, color: "text-slate-900 hover:text-red-600", bg: "bg-slate-50", action: () => window.open(`tel:${cleanPhoneNumber(whatsappNumber)}`), nowrap: true },
+                                    { icon: Mail, label: "Official Email", val: email, color: "text-slate-900 hover:text-red-600", bg: "bg-slate-50", action: () => window.open(`mailto:${email}`), nowrap: false },
+                                    { icon: MessageCircle, label: "Live WhatsApp", val: "Chat Now", color: "text-green-600 hover:text-green-700", bg: "bg-green-50/50", action: handleInstantWhatsApp, nowrap: true }
                                 ].map((item, i) => (
-                                    <div key={i} className="flex gap-6 group cursor-pointer" onClick={item.action}>
-                                        <div className={cn("h-14 w-14 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-all duration-300 group-hover:scale-110", item.bg)}>
-                                            <item.icon className="h-6 w-6" />
+                                    <div key={i} className="flex gap-4 group cursor-pointer items-center" onClick={item.action}>
+                                        <div className={cn("h-12 w-12 md:h-14 md:w-14 rounded-xl flex items-center justify-center shrink-0 shadow-sm transition-all duration-300 group-hover:scale-110", item.bg)}>
+                                            <item.icon className="h-5 w-5 md:h-6 md:w-6" />
                                         </div>
-                                        <div>
+                                        <div className="min-w-0 flex-1">
                                             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">{item.label}</p>
-                                            <p className={cn("text-lg font-black tracking-tight uppercase", item.color)}>{item.val}</p>
+                                            <p className={cn(
+                                                "text-base md:text-lg font-black tracking-tight uppercase",
+                                                item.color,
+                                                item.nowrap ? "whitespace-nowrap" : "break-all text-sm md:text-base"
+                                            )}>{item.val}</p>
                                         </div>
                                     </div>
                                 ))}

@@ -1,7 +1,8 @@
 
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
 import { NextResponse } from 'next/server';
+import { put } from '@vercel/blob';
+import { writeFile, mkdir } from 'fs/promises';
+import path from 'path';
 
 export async function POST(request: Request) {
     try {
@@ -12,33 +13,48 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
         }
 
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
+        const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
 
-        // Define the upload directory
-        const uploadDir = join(process.cwd(), 'public', 'uploads');
-
-        // Ensure the directory exists
-        try {
-            await mkdir(uploadDir, { recursive: true });
-        } catch (err) {
-            // Ignore if directory already exists
+        // Attempt 1: Vercel Blob Storage (if token is available)
+        if (blobToken) {
+            try {
+                const blob = await put(file.name, file, {
+                    access: 'public',
+                    addRandomSuffix: true,
+                    token: blobToken,
+                });
+                return NextResponse.json({ url: blob.url });
+            } catch (blobError: any) {
+                console.warn("[Upload API] Vercel Blob upload failed, switching to local storage fallback:", blobError.message);
+            }
         }
 
-        // Generate a unique filename
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const filename = `${uniqueSuffix}-${file.name.replace(/\s+/g, '-')}`;
-        const path = join(uploadDir, filename);
+        // Attempt 2: Local Disk Storage Fallback (public/uploads)
+        try {
+            const bytes = await file.arrayBuffer();
+            const buffer = Buffer.from(bytes);
 
-        // Save the file
-        await writeFile(path, buffer);
+            const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+            await mkdir(uploadsDir, { recursive: true });
 
-        // Return the public URL
-        const publicUrl = `/uploads/${filename}`;
+            // Generate clean unique filename
+            const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+            const ext = path.extname(cleanName) || '.jpg';
+            const basename = path.basename(cleanName, ext);
+            const filename = `${basename}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}${ext}`;
+            const filePath = path.join(uploadsDir, filename);
 
-        return NextResponse.json({ url: publicUrl });
-    } catch (error) {
-        console.error("Upload error:", error);
-        return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+            await writeFile(filePath, buffer);
+
+            const fileUrl = `/uploads/${filename}`;
+            return NextResponse.json({ url: fileUrl });
+        } catch (localError: any) {
+            console.error("[Upload API] Local upload error:", localError);
+            return NextResponse.json({ error: `Gagal menyimpan gambar: ${localError.message}` }, { status: 500 });
+        }
+    } catch (error: any) {
+        console.error("[Upload API] System error:", error);
+        return NextResponse.json({ error: `Kesalahan Sistem: ${error.message}` }, { status: 500 });
     }
 }
+

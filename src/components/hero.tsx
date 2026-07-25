@@ -1,120 +1,189 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { MessageCircle, ArrowRight, CheckCircle2 } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cleanPhoneNumber } from "@/lib/utils";
+import type { Promotion } from "@/types";
 
-export function Hero({ settings }: { settings?: Record<string, string> }) {
-    const badge = settings?.hero_badge || "Authorized Honda Dealer";
-    const titleMain = settings?.hero_title_main || "Dealer Resmi Honda";
-    const titleHighlight = settings?.hero_title_highlight || "Autoland";
-    const description = settings?.hero_subtitle || "Membawa standar kualitas Honda terbaik untuk setiap perjalanan Anda.";
+interface HeroProps {
+    settings?: Record<string, string>;
+    promotions?: Promotion[];
+}
+
+const slideVariants = {
+    enter: (direction: number) => ({
+        x: direction > 0 ? "100%" : "-100%",
+        opacity: 0
+    }),
+    center: {
+        zIndex: 1,
+        x: 0,
+        opacity: 1
+    },
+    exit: (direction: number) => ({
+        zIndex: 0,
+        x: direction < 0 ? "100%" : "-100%",
+        opacity: 0
+    })
+};
+
+export function Hero({ settings, promotions = [] }: HeroProps) {
     const whatsapp = settings?.whatsapp_number || "6285863162206";
-    const ctaPrimary = settings?.hero_cta_whatsapp || "Konsultasi";
-    const ctaSecondary = settings?.hero_cta_catalog || "Lihat Unit";
 
-    // Benefits - CMS controlled
-    const benefit1 = settings?.hero_benefit_1 || "Proses Cepat";
-    const benefit2 = settings?.hero_benefit_2 || "DP Ringan";
-    const benefit3 = settings?.hero_benefit_3 || "Bunga Rendah";
-    const benefit4 = settings?.hero_benefit_4 || "Terpercaya";
+    // Filter active promos
+    const activePromos = promotions.filter((p) => p.isActive !== false);
 
-    const benefits = [benefit1, benefit2, benefit3, benefit4];
+    // Fallback slides if no active promos are available in DB
+    const defaultSlides = [
+        {
+            id: "default-1",
+            title: "Promo Special Honda",
+            image: settings?.hero_image_url || "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=100&w=2560",
+            link: `https://wa.me/${cleanPhoneNumber(whatsapp)}`
+        },
+        {
+            id: "default-2",
+            title: "Honda Civic RS",
+            image: "https://images.unsplash.com/photo-1590362891991-f776e747a588?q=100&w=2560",
+            link: "/mobil"
+        },
+        {
+            id: "default-3",
+            title: "Honda HR-V Special Offer",
+            image: "https://images.unsplash.com/photo-1619682817481-e99489121b99?q=100&w=2560",
+            link: "/promo"
+        }
+    ];
+
+    const slides = activePromos.length > 0
+        ? activePromos.map((p) => ({
+            id: p.id,
+            title: p.title,
+            image: p.image,
+            link: p.link || `https://wa.me/${cleanPhoneNumber(whatsapp)}?text=${encodeURIComponent(`Halo, saya tertarik dengan promo: ${p.title}`)}`
+        }))
+        : defaultSlides;
+
+    const [[page, direction], setPage] = useState<[number, number]>([0, 0]);
+    const [isHovered, setIsHovered] = useState(false);
+
+    const currentIndex = Math.abs(page % slides.length);
+
+    const paginate = useCallback((newDirection: number) => {
+        setPage(([prevPage]) => [prevPage + newDirection, newDirection]);
+    }, []);
+
+    // Autoplay slider every 5 seconds (paused on hover)
+    useEffect(() => {
+        if (slides.length <= 1 || isHovered) return;
+
+        const timer = setInterval(() => {
+            paginate(1);
+        }, 5000);
+
+        return () => clearInterval(timer);
+    }, [slides.length, isHovered, paginate]);
+
+    const currentSlide = slides[currentIndex];
 
     return (
-        <section className="relative min-h-[85vh] flex flex-col items-center justify-center overflow-hidden bg-slate-950">
-            {/* Background Image - Darker and more subtle */}
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src={settings?.hero_image_url || "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=100&w=2560"}
-                    alt="Honda Premium Experience"
-                    fill
-                    className="object-cover opacity-40 blur-[2px]"
-                    priority
-                    quality={90}
-                    sizes="100vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/50 to-slate-950 z-10 pointer-events-none" />
-                <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none" />
-            </div>
+        <section className="relative pt-24 md:pt-28 pb-6 md:pb-12 bg-slate-950 overflow-hidden">
+            <div className="container mx-auto px-4 md:px-8">
+                {/* Hero Banner Slider Container */}
+                <div
+                    className="relative w-full h-[240px] sm:h-[380px] md:h-[500px] lg:h-[600px] rounded-2xl md:rounded-3xl overflow-hidden bg-slate-900 shadow-2xl shadow-black/50 group"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
+                    <AnimatePresence initial={false} custom={direction}>
+                        <motion.div
+                            key={page}
+                            custom={direction}
+                            variants={slideVariants}
+                            initial="enter"
+                            animate="center"
+                            exit="exit"
+                            transition={{
+                                x: { type: "spring", stiffness: 300, damping: 30 },
+                                opacity: { duration: 0.3 }
+                            }}
+                            className="absolute inset-0 w-full h-full"
+                        >
+                            {currentSlide.link ? (
+                                <Link
+                                    href={currentSlide.link}
+                                    target={currentSlide.link.startsWith("http") ? "_blank" : "_self"}
+                                    className="block w-full h-full relative cursor-pointer"
+                                >
+                                    <Image
+                                        src={currentSlide.image}
+                                        alt={currentSlide.title || "Promo Honda"}
+                                        fill
+                                        className="object-cover object-center"
+                                        priority={currentIndex === 0}
+                                        quality={95}
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1400px"
+                                    />
+                                </Link>
+                            ) : (
+                                <div className="w-full h-full relative">
+                                    <Image
+                                        src={currentSlide.image}
+                                        alt={currentSlide.title || "Promo Honda"}
+                                        fill
+                                        className="object-cover object-center"
+                                        priority={currentIndex === 0}
+                                        quality={95}
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1400px"
+                                    />
+                                </div>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
 
-            {/* Main Content */}
-            <div className="container mx-auto px-6 relative z-20 pt-32 pb-20 md:pt-48 md:pb-32">
-                <div className="max-w-5xl mx-auto text-center space-y-10">
+                    {/* Left & Right Navigation Arrows */}
+                    {slides.length > 1 && (
+                        <>
+                            <button
+                                onClick={() => paginate(-1)}
+                                aria-label="Previous Slide"
+                                className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-13 md:h-13 rounded-full bg-slate-950/40 hover:bg-slate-950/80 text-white backdrop-blur-md border border-white/10 flex items-center justify-center transition-all duration-300 shadow-lg md:opacity-0 md:group-hover:opacity-100"
+                            >
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
 
-                    {/* Minimalist Badge */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/5 backdrop-blur-sm mx-auto"
-                    >
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
-                        <span className="text-[10px] font-bold text-white/90 uppercase tracking-[0.25em]">{badge}</span>
-                    </motion.div>
+                            <button
+                                onClick={() => paginate(1)}
+                                aria-label="Next Slide"
+                                className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-13 md:h-13 rounded-full bg-slate-950/40 hover:bg-slate-950/80 text-white backdrop-blur-md border border-white/10 flex items-center justify-center transition-all duration-300 shadow-lg md:opacity-0 md:group-hover:opacity-100"
+                            >
+                                <ChevronRight className="w-6 h-6" />
+                            </button>
 
-                    {/* Title Section - Cleaner Typography */}
-                    <motion.div
-                        className="space-y-6"
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1, duration: 0.7 }}
-                    >
-                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight leading-[1.1]">
-                            {titleMain} <br className="hidden md:block" />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600 font-extrabold ml-2 md:ml-0">
-                                {titleHighlight}
-                            </span>
-                        </h1>
-                        <p className="text-slate-300 text-sm md:text-lg font-normal max-w-2xl mx-auto leading-relaxed px-4">
-                            {description}
-                        </p>
-                    </motion.div>
-
-                    {/* Clean Benefits Row */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.4, duration: 0.8 }}
-                        className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3"
-                    >
-                        {benefits.map((benefit, index) => (
-                            <div key={index} className="flex items-center gap-2 text-white/60">
-                                <CheckCircle2 className="w-4 h-4 text-red-500/80" />
-                                <span className="text-[10px] md:text-xs font-medium uppercase tracking-wider">{benefit}</span>
+                            {/* Pagination Dots */}
+                            <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-950/40 backdrop-blur-md border border-white/10">
+                                {slides.map((_, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setPage([idx, idx > currentIndex ? 1 : -1])}
+                                        aria-label={`Go to slide ${idx + 1}`}
+                                        className={`h-2 rounded-full transition-all duration-300 ${
+                                            idx === currentIndex
+                                                ? "w-7 bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.7)]"
+                                                : "w-2 bg-white/40 hover:bg-white/80"
+                                        }`}
+                                    />
+                                ))}
                             </div>
-                        ))}
-                    </motion.div>
-
-                    {/* Refined Action Buttons */}
-                    <motion.div
-                        className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3, duration: 0.6 }}
-                    >
-                        <Link href={`https://wa.me/${cleanPhoneNumber(whatsapp)}`} target="_blank" className="w-full sm:w-auto">
-                            <Button className="w-full h-12 md:h-14 px-8 rounded-full bg-red-600 hover:bg-red-700 text-white font-bold text-sm tracking-wide shadow-lg shadow-red-900/20 transition-all hover:scale-105 border-none">
-                                {ctaPrimary}
-                            </Button>
-                        </Link>
-
-                        <Link href="/mobil" className="w-full sm:w-auto">
-                            <Button variant="outline" className="w-full h-12 md:h-14 px-8 rounded-full bg-white/5 border-white/30 text-white hover:bg-white hover:text-slate-950 hover:border-white font-bold text-sm tracking-wide transition-all group flex items-center justify-center gap-2 backdrop-blur-md">
-                                {ctaSecondary}
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </Button>
-                        </Link>
-                    </motion.div>
+                        </>
+                    )}
                 </div>
             </div>
-
-            {/* Subtle Gradient Overlay at bottom for smooth transition */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-950 to-transparent z-10" />
         </section>
     );
 }
+
 

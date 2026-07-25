@@ -1,7 +1,9 @@
+
 "use server";
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { put } from "@vercel/blob";
 import fs from "fs/promises";
 import path from "path";
 
@@ -11,26 +13,40 @@ export async function updateSettingsAction(formData: FormData) {
 
     try {
         const updates: Record<string, string> = {};
+        const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
 
         for (const [key, value] of entries) {
             if (key.startsWith('$')) continue;
 
             if (value instanceof File && value.size > 0 && value.name !== "undefined") {
                 console.log(`Processing file: [${key}] - ${value.name}`);
-                const arrayBuffer = await value.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
 
-                const timestamp = Date.now();
-                const originalName = value.name.replace(/[^a-zA-Z0-9.-]/g, '');
-                const filename = `${key}-${timestamp}-${originalName}`;
+                // Use Vercel Blob if token is available
+                if (blobToken) {
+                    const blob = await put(`${key}-${value.name}`, value, {
+                        access: 'public',
+                        addRandomSuffix: true,
+                    });
+                    updates[key] = blob.url;
+                } else if (process.env.NODE_ENV === 'development') {
+                    // Fallback to local filesystem ONLY in development
+                    const arrayBuffer = await value.arrayBuffer();
+                    const buffer = Buffer.from(arrayBuffer);
 
-                const uploadDir = path.join(process.cwd(), "public", "uploads");
-                await fs.mkdir(uploadDir, { recursive: true });
+                    const timestamp = Date.now();
+                    const originalName = value.name.replace(/[^a-zA-Z0-9.-]/g, '');
+                    const filename = `${key}-${timestamp}-${originalName}`;
 
-                const filepath = path.join(uploadDir, filename);
-                await fs.writeFile(filepath, buffer);
+                    const uploadDir = path.join(process.cwd(), "public", "uploads");
+                    await fs.mkdir(uploadDir, { recursive: true });
 
-                updates[key] = `/uploads/${filename}`;
+                    const filepath = path.join(uploadDir, filename);
+                    await fs.writeFile(filepath, buffer);
+
+                    updates[key] = `/uploads/${filename}`;
+                } else {
+                    throw new Error("Cloud Storage (Vercel Blob) belum terkonfigurasi. Silakan hubungkan di Dashboard Vercel.");
+                }
             } else if (typeof value === 'string') {
                 updates[key] = value;
             }

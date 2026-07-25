@@ -84,13 +84,13 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
             </AnimatePresence>
 
             {/* Header */}
-            <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md rounded-b-2xl py-6 mb-8 border-b border-slate-200 shadow-sm">
-                <div className="flex items-center justify-between gap-4">
+            <div className="sticky top-0 md:top-0 z-30 bg-white/90 backdrop-blur-md rounded-b-2xl py-4 md:py-6 mb-6 md:mb-8 border-b border-slate-200 shadow-sm">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Pengaturan Website</h1>
-                        <p className="text-sm font-medium text-slate-500">Kelola identitas dealer, konten beranda, dan banner promo.</p>
+                        <h1 className="text-xl md:text-2xl font-bold text-slate-900">Pengaturan Website</h1>
+                        <p className="text-xs md:text-sm font-medium text-slate-500 mt-0.5">Kelola identitas dealer, konten beranda, dan banner promo.</p>
                     </div>
-                    <Button type="submit" disabled={isSaving} className="bg-blue-600 hover:bg-blue-700 text-white px-8 h-12 rounded-xl shadow-lg shadow-blue-600/20 transition-all font-bold group">
+                    <Button type="submit" disabled={isSaving} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 h-11 rounded-xl shadow-lg shadow-blue-600/20 transition-all font-bold group flex-shrink-0">
                         <AnimatePresence mode="wait">
                             {isSaving ? (
                                 <motion.div
@@ -121,26 +121,34 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
             </div>
 
             <Tabs defaultValue="general" className="w-full space-y-8">
-                <div className="bg-slate-50 p-1.5 rounded-xl border border-slate-200 inline-flex">
-                    <TabsList className="grid w-full grid-cols-4 h-auto bg-transparent gap-2">
-                        <TabsTrigger value="general" className="data-[state=active]:bg-white data-[state=active]:shadow-sm py-2.5 px-6 rounded-lg text-sm font-medium transition-all">
-                            <Globe className="w-4 h-4 mr-2" />
-                            Umum & Identitas
-                        </TabsTrigger>
-                        <TabsTrigger value="home" className="data-[state=active]:bg-white data-[state=active]:shadow-sm py-2.5 px-6 rounded-lg text-sm font-medium transition-all">
-                            <Layout className="w-4 h-4 mr-2" />
-                            Halaman Beranda
-                        </TabsTrigger>
-                        <TabsTrigger value="pages" className="data-[state=active]:bg-white data-[state=active]:shadow-sm py-2.5 px-6 rounded-lg text-sm font-medium transition-all">
-                            <FileText className="w-4 h-4 mr-2" />
-                            Header
-                        </TabsTrigger>
-                        <TabsTrigger value="content" className="data-[state=active]:bg-white data-[state=active]:shadow-sm py-2.5 px-6 rounded-lg text-sm font-medium transition-all">
-                            <BookOpen className="w-4 h-4 mr-2" />
-                            Konten Detail
-                        </TabsTrigger>
-                    </TabsList>
+                {/* Tabs - scrollable on mobile */}
+                <div className="w-full overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0">
+                    <div className="bg-slate-50 p-1.5 rounded-xl border border-slate-200 flex min-w-max md:min-w-0 md:inline-flex">
+                        <TabsList className="flex md:grid md:grid-cols-4 h-auto bg-transparent gap-1.5">
+                            <TabsTrigger value="general" className="data-[state=active]:bg-white data-[state=active]:shadow-sm py-2.5 px-3 md:px-6 rounded-lg text-xs md:text-sm font-medium transition-all flex-shrink-0 flex flex-col md:flex-row items-center gap-1 md:gap-2 min-w-[72px] md:min-w-0">
+                                <Globe className="w-4 h-4" />
+                                <span className="hidden md:inline">Umum & Identitas</span>
+                                <span className="md:hidden text-[9px] font-bold uppercase tracking-tight">Umum</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="home" className="data-[state=active]:bg-white data-[state=active]:shadow-sm py-2.5 px-3 md:px-6 rounded-lg text-xs md:text-sm font-medium transition-all flex-shrink-0 flex flex-col md:flex-row items-center gap-1 md:gap-2 min-w-[72px] md:min-w-0">
+                                <Layout className="w-4 h-4" />
+                                <span className="hidden md:inline">Halaman Beranda</span>
+                                <span className="md:hidden text-[9px] font-bold uppercase tracking-tight">Beranda</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="pages" className="data-[state=active]:bg-white data-[state=active]:shadow-sm py-2.5 px-3 md:px-6 rounded-lg text-xs md:text-sm font-medium transition-all flex-shrink-0 flex flex-col md:flex-row items-center gap-1 md:gap-2 min-w-[72px] md:min-w-0">
+                                <FileText className="w-4 h-4" />
+                                <span className="hidden md:inline">Header</span>
+                                <span className="md:hidden text-[9px] font-bold uppercase tracking-tight">Header</span>
+                            </TabsTrigger>
+                            <TabsTrigger value="content" className="data-[state=active]:bg-white data-[state=active]:shadow-sm py-2.5 px-3 md:px-6 rounded-lg text-xs md:text-sm font-medium transition-all flex-shrink-0 flex flex-col md:flex-row items-center gap-1 md:gap-2 min-w-[72px] md:min-w-0">
+                                <BookOpen className="w-4 h-4" />
+                                <span className="hidden md:inline">Konten Detail</span>
+                                <span className="md:hidden text-[9px] font-bold uppercase tracking-tight">Detail</span>
+                            </TabsTrigger>
+                        </TabsList>
+                    </div>
                 </div>
+
 
                 <TabsContent value="general" className="space-y-8 mt-0 focus-visible:outline-none">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

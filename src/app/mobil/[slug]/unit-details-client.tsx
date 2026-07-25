@@ -192,13 +192,13 @@ export function UnitDetailsClient({
             <div className="space-y-32">
                 {/* Step 1: Variant Selection */}
                 <section className="container mx-auto px-6">
-                    <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-                        <div className="space-y-4">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 md:mb-12 gap-6">
+                        <div className="space-y-2 md:space-y-4">
                             <div className="flex items-center gap-3">
-                                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-red-600 text-white text-xs font-black italic">1</span>
-                                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-red-600">Pilih Varian</h2>
+                                <span className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-full bg-red-600 text-white text-[10px] md:text-xs font-black italic">1</span>
+                                <h2 className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] md:tracking-[0.4em] text-red-600">Pilih Varian</h2>
                             </div>
-                            <h3 className="text-2xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 leading-tight">
+                            <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 leading-[0.9] md:leading-tight">
                                 TIPE <span className="text-slate-400">&</span> PERFORMA
                             </h3>
                         </div>
@@ -312,13 +312,13 @@ export function UnitDetailsClient({
 
                 {/* Step 2: Color Selection */}
                 <section className="container mx-auto px-6 pb-16">
-                    <div className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-16 gap-6">
-                        <div className="space-y-4">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-16 gap-6">
+                        <div className="space-y-2 md:space-y-4">
                             <div className="flex items-center gap-3">
-                                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-red-600 text-white text-xs font-black italic">2</span>
-                                <h2 className="text-xs font-black uppercase tracking-[0.4em] text-red-600">Pilih Warna</h2>
+                                <span className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-full bg-red-600 text-white text-[10px] md:text-xs font-black italic">2</span>
+                                <h2 className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] md:tracking-[0.4em] text-red-600">Pilih Warna</h2>
                             </div>
-                            <h3 className="text-2xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 leading-tight">
+                            <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-slate-900 leading-[0.9] md:leading-tight">
                                 EKSPRESI <span className="text-slate-400">&</span> GAYA
                             </h3>
                         </div>

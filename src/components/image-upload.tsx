@@ -30,12 +30,19 @@ export function ImageUpload({ name, defaultValue, recommendation }: ImageUploadP
                 method: "POST",
                 body: formData,
             });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || "Upload failed");
+            }
+
             const data = await res.json();
             if (data.url) {
                 setPreview(data.url);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Upload failed", error);
+            alert(`Upload Gagal: ${error.message}`);
         } finally {
             setIsUploading(false);
         }

@@ -1,11 +1,9 @@
-
 generator client {
   provider = "prisma-client-js"
 }
 
-// NOTE: Change to "postgresql" and update DATABASE_URL in .env when ready to deploy
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -18,37 +16,37 @@ model Admin {
 }
 
 model Car {
-  id           String       @id @default(cuid())
-  name         String
-  slug         String       @unique
-  brand        String       @default("Honda")
-  price        Int          // Starting OTR Price
-  status       String       @default("Ready Stock") // Ready / Indent
-  badge        String?      // New / Promo / Best Seller
-  thumbnail    String
-  gallery      String       // Store as JSON string since SQLite doesn't support arrays
-  interiorGallery String?   // Store as JSON string for interior photos
-  videoUrl     String?      // YouTube Link
-  catalogUrl   String?      // E-Katalog Link (e.g., Google Drive)
-  description  String       // Rich Text
-  specDefinitions String?    // JSON string for spec labels/order
-  colors       String?      // Master color registry
-  isActive     Boolean      @default(true)
-  isFeatured   Boolean      @default(false)
-  variants     CarVariant[]
-  leads        LeadLog[]
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id              String       @id @default(cuid())
+  name            String
+  slug            String       @unique
+  brand           String       @default("Honda")
+  price           Int
+  status          String       @default("Ready Stock")
+  badge           String?
+  thumbnail       String
+  gallery         String
+  interiorGallery String?
+  videoUrl        String?
+  catalogUrl      String?
+  description     String
+  specDefinitions String?
+  colors          String?
+  isActive        Boolean      @default(true)
+  isFeatured      Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  variants        CarVariant[]
+  leads           LeadLog[]
 }
 
 model CarVariant {
-  id      String @id @default(cuid())
-  carId   String
-  name    String // e.g., 1.5 Turbo RS
-  price   Int    // Variant OTR Price
-  specs   String? // JSON string for variant-specific spec overrides
-  colors  String? // JSON string for selected color names
-  car     Car    @relation(fields: [carId], references: [id], onDelete: Cascade)
+  id     String  @id @default(cuid())
+  carId  String
+  name   String
+  price  Int
+  specs  String?
+  colors String?
+  car    Car     @relation(fields: [carId], references: [id], onDelete: Cascade)
 }
 
 model Promotion {
@@ -64,11 +62,11 @@ model Promotion {
 }
 
 model Sales {
-  id        String  @id @default(cuid())
-  name      String
-  photo     String
-  whatsapp  String
-  isActive  Boolean @default(true)
+  id       String  @id @default(cuid())
+  name     String
+  photo    String
+  whatsapp String
+  isActive Boolean @default(true)
 }
 
 model LeadLog {
@@ -77,7 +75,6 @@ model LeadLog {
   salesId   String?
   type      String   @default("WHATSAPP_CLICK")
   createdAt DateTime @default(now())
-  
   car       Car?     @relation(fields: [carId], references: [id])
 }
 
@@ -91,7 +88,7 @@ model Page {
   id        String   @id @default(cuid())
   slug      String   @unique
   title     String
-  content   String?  // JSON or Markdown
+  content   String?
   updatedAt DateTime @updatedAt
 }
 

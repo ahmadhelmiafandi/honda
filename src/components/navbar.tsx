@@ -74,7 +74,7 @@ export function Navbar({ settings }: { settings?: Record<string, string> }) {
                                     src={(!isScrolled ? settings.site_logo_light : settings.site_logo) || settings.site_logo || settings.site_logo_light}
                                     alt={settings?.site_name || "Logo"}
                                     className={cn(
-                                        "h-9 w-auto max-w-[180px] object-contain transition-all duration-500",
+                                        "h-11 w-auto max-w-[200px] object-contain",
                                         !isScrolled && !settings?.site_logo_light && "brightness-0 invert"
                                     )}
                                 />
@@ -113,7 +113,7 @@ export function Navbar({ settings }: { settings?: Record<string, string> }) {
                                 src={(!isScrolled ? settings.site_logo_light : settings.site_logo) || settings.site_logo || settings.site_logo_light}
                                 alt={settings?.site_name || "Logo"}
                                 className={cn(
-                                    "h-10 w-auto object-contain transition-all duration-500",
+                                    "h-11 w-auto max-w-[200px] object-contain",
                                     !isScrolled && !settings?.site_logo_light && "brightness-0 invert"
                                 )}
                             />

@@ -134,7 +134,7 @@ export default function HomePageClient({ featuredCars, settings, testimonials, p
 
     return (
         <div className="flex flex-col bg-white overflow-x-hidden">
-            <Hero settings={settings} />
+            <Hero settings={settings} promotions={promotions} />
 
 
 

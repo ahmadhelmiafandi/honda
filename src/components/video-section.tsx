@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -12,11 +13,15 @@ interface VideoSectionProps {
 
 export function VideoSection({
     url,
-    titleMain = "Lihat Performa",
-    titleHighlight = "Terbaik",
-    description = "Saksikan kecanggihan teknologi dan kenyamanan berkendara yang ditawarkan oleh lini kendaraan terbaru kami."
+    titleMain,
+    titleHighlight,
+    description
 }: VideoSectionProps) {
-    if (!url) return null;
+    // If url is empty string or undefined, use a default fallback
+    const videoUrl = (url && url.trim() !== "") ? url : "https://www.youtube.com/watch?v=F_fPQu3-u8k";
+    const displayTitleMain = (titleMain && titleMain.trim() !== "") ? titleMain : "Product & Event";
+    const displayTitleHighlight = (titleHighlight && titleHighlight.trim() !== "") ? titleHighlight : "Highlights";
+    const displayDescription = (description && description.trim() !== "") ? description : "Saksikan kemeriahan event terbaru kami dan review eksklusif produk Honda pilihan yang siap menemani perjalanan Anda.";
 
     // Extract Video ID from various YouTube URL formats
     const getYouTubeId = (url: string) => {
@@ -25,7 +30,7 @@ export function VideoSection({
         return (match && match[2].length === 11) ? match[2] : null;
     };
 
-    const videoId = getYouTubeId(url);
+    const videoId = getYouTubeId(videoUrl);
     if (!videoId) return null;
 
     return (
@@ -49,10 +54,10 @@ export function VideoSection({
                             <span className="h-px w-8 bg-red-600" />
                         </div>
                         <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight uppercase">
-                            {titleMain} <span className="text-red-600">{titleHighlight}</span>
+                            {displayTitleMain} <span className="text-red-600">{displayTitleHighlight}</span>
                         </h2>
                         <p className="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
-                            {description}
+                            {displayDescription}
                         </p>
                     </motion.div>
                 </div>
