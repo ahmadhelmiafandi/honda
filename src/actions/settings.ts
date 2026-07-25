@@ -20,33 +20,46 @@ export async function updateSettingsAction(formData: FormData) {
 
             if (value instanceof File && value.size > 0 && value.name !== "undefined") {
                 console.log(`Processing file: [${key}] - ${value.name}`);
+                let uploadedUrl: string | null = null;
 
-                // Use Vercel Blob if token is available
+                // Attempt 1: Vercel Blob Storage
                 if (blobToken) {
-                    const blob = await put(`${key}-${value.name}`, value, {
-                        access: 'public',
-                        addRandomSuffix: true,
-                    });
-                    updates[key] = blob.url;
-                } else if (process.env.NODE_ENV === 'development') {
-                    // Fallback to local filesystem ONLY in development
-                    const arrayBuffer = await value.arrayBuffer();
-                    const buffer = Buffer.from(arrayBuffer);
-
-                    const timestamp = Date.now();
-                    const originalName = value.name.replace(/[^a-zA-Z0-9.-]/g, '');
-                    const filename = `${key}-${timestamp}-${originalName}`;
-
-                    const uploadDir = path.join(process.cwd(), "public", "uploads");
-                    await fs.mkdir(uploadDir, { recursive: true });
-
-                    const filepath = path.join(uploadDir, filename);
-                    await fs.writeFile(filepath, buffer);
-
-                    updates[key] = `/uploads/${filename}`;
-                } else {
-                    throw new Error("Cloud Storage (Vercel Blob) belum terkonfigurasi. Silakan hubungkan di Dashboard Vercel.");
+                    try {
+                        const blob = await put(`${key}-${value.name}`, value, {
+                            access: 'public',
+                            addRandomSuffix: true,
+                            token: blobToken,
+                        });
+                        uploadedUrl = blob.url;
+                    } catch (blobError: any) {
+                        console.warn(`[Settings Action] Vercel Blob upload failed for ${key}, falling back to local storage:`, blobError.message);
+                    }
                 }
+
+                // Attempt 2: Local Filesystem Storage Fallback (public/uploads)
+                if (!uploadedUrl) {
+                    try {
+                        const arrayBuffer = await value.arrayBuffer();
+                        const buffer = Buffer.from(arrayBuffer);
+
+                        const timestamp = Date.now();
+                        const originalName = value.name.replace(/[^a-zA-Z0-9.-]/g, '');
+                        const filename = `${key}-${timestamp}-${originalName}`;
+
+                        const uploadDir = path.join(process.cwd(), "public", "uploads");
+                        await fs.mkdir(uploadDir, { recursive: true });
+
+                        const filepath = path.join(uploadDir, filename);
+                        await fs.writeFile(filepath, buffer);
+
+                        uploadedUrl = `/uploads/${filename}`;
+                    } catch (localError: any) {
+                        console.error(`[Settings Action] Local upload failed for ${key}:`, localError);
+                        throw new Error(`Gagal menyimpan file ${key}: ${localError.message}`);
+                    }
+                }
+
+                updates[key] = uploadedUrl;
             } else if (typeof value === 'string') {
                 updates[key] = value;
             }

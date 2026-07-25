@@ -84,13 +84,18 @@ export default function AdminSettingsClient({ initialSettings }: AdminSettingsCl
             </AnimatePresence>
 
             {/* Header */}
-            <div className="sticky top-0 md:top-0 z-30 bg-white/90 backdrop-blur-md rounded-b-2xl py-4 md:py-6 mb-6 md:mb-8 border-b border-slate-200 shadow-sm">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div>
-                        <h1 className="text-xl md:text-2xl font-bold text-slate-900">Pengaturan Website</h1>
-                        <p className="text-xs md:text-sm font-medium text-slate-500 mt-0.5">Kelola identitas dealer, konten beranda, dan banner promo.</p>
+            <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm mb-6 md:mb-8">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 hidden sm:flex">
+                            <Monitor className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div>
+                            <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">Pengaturan Website</h1>
+                            <p className="text-xs md:text-sm font-medium text-slate-500 mt-0.5">Kelola identitas dealer, konten beranda, dan banner promo.</p>
+                        </div>
                     </div>
-                    <Button type="submit" disabled={isSaving} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 h-11 rounded-xl shadow-lg shadow-blue-600/20 transition-all font-bold group flex-shrink-0">
+                    <Button type="submit" disabled={isSaving} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 h-12 rounded-xl shadow-lg shadow-blue-600/20 transition-all font-bold group flex-shrink-0">
                         <AnimatePresence mode="wait">
                             {isSaving ? (
                                 <motion.div
