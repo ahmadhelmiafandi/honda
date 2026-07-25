@@ -90,11 +90,11 @@ export function Hero({ settings, promotions = [] }: HeroProps) {
     const currentSlide = slides[currentIndex];
 
     return (
-        <section className="relative pt-24 md:pt-28 pb-6 md:pb-12 bg-slate-950 overflow-hidden">
-            <div className="container mx-auto px-4 md:px-8">
-                {/* Hero Banner Slider Container */}
+        <section className="relative pt-20 md:pt-24 pb-6 md:pb-10 bg-slate-950 overflow-hidden">
+            <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-[1600px]">
+                {/* Hero Banner Slider Container with Fluid Aspect Ratio */}
                 <div
-                    className="relative w-full h-[240px] sm:h-[380px] md:h-[500px] lg:h-[600px] rounded-2xl md:rounded-3xl overflow-hidden bg-slate-900 shadow-2xl shadow-black/50 group"
+                    className="relative w-full aspect-[16/10] sm:aspect-[16/7] md:aspect-[21/9] lg:aspect-[2.4/1] max-h-[72vh] rounded-2xl md:rounded-3xl overflow-hidden bg-slate-900 shadow-2xl shadow-black/50 group border border-white/5"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
