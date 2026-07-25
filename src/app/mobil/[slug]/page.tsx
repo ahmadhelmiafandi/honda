@@ -27,12 +27,24 @@ export async function generateMetadata(
         }
     }
 
+    const title = `${car.name} 2026 - Harga OTR, Spesifikasi & Simulasi Kredit | Dealer Honda`;
+    const description = `Dapatkan ${car.name} terbaru 2026 dengan promo DP Murah & Bunga Rendah. ${car.description?.substring(0, 140)}`;
+
     return {
-        title: `${car.name} - Unit Honda Terbaru | Honda Official`,
-        description: `${car.description?.substring(0, 160)}`,
+        title,
+        description,
+        keywords: `${car.name}, harga ${car.name}, kredit ${car.name}, promo ${car.name}, spesifikasi ${car.name}, dealer honda`,
         openGraph: {
+            title,
+            description,
             images: [car.thumbnail],
         },
+        twitter: {
+            card: "summary_large_image",
+            title,
+            description,
+            images: [car.thumbnail],
+        }
     }
 }
 
@@ -48,10 +60,38 @@ export default async function CarDetail({ params }: Props) {
     const settings = settingsData.reduce((acc: any, curr: any) => ({ ...acc, [curr.key]: curr.value }), {});
     const whatsappNumber = settings.whatsapp_number || "6285863162206";
 
+    // Product Schema (Schema.org for Google Search Rich Snippet)
+    const jsonLdProduct = {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": car.name,
+        "image": [car.thumbnail],
+        "description": car.description,
+        "brand": {
+            "@type": "Brand",
+            "name": "Honda"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.hondaautoland.com'}/mobil/${car.slug}`,
+            "priceCurrency": "IDR",
+            "price": car.price,
+            "availability": car.status === "Ready Stock" ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+            "seller": {
+                "@type": "AutoDealer",
+                "name": settings.site_name || "Honda Autoland"
+            }
+        }
+    };
+
     // Parse JSON strings for global data
     const colors = JSON.parse(car.colors || "[]");
     return (
         <div className="bg-white min-h-screen pb-32 overflow-x-hidden">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdProduct) }}
+            />
             {/* 1. CINEMATIC HERO */}
             <section id="overview" className="relative h-[60vh] md:h-[85vh] flex items-center justify-center overflow-hidden bg-slate-950">
                 {/* Background Car Image */}
