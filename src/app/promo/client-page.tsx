@@ -95,6 +95,7 @@ export default function PromoClient({ promos, settings }: PromoClientProps) {
                                         alt={promo.title}
                                         fill
                                         className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                                        unoptimized
                                     />
                                     <div className="absolute top-8 left-8">
                                         <Badge className="bg-red-600/90 backdrop-blur-md text-white border-none font-bold px-6 py-3 text-[10px] uppercase tracking-[0.2em] rounded-xl shadow-2xl">

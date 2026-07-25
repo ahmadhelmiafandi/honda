@@ -526,6 +526,7 @@ export default function HomePageClient({ featuredCars, settings, testimonials, p
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-700"
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            unoptimized
                                         />
                                         {promo.tag && (
                                             <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/50 shadow-sm">

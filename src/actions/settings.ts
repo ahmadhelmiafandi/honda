@@ -36,25 +36,27 @@ export async function updateSettingsAction(formData: FormData) {
                     }
                 }
 
-                // Attempt 2: Local Filesystem Storage Fallback (public/uploads)
+                // Attempt 2: Base64 Data URL Fallback (Guaranteed to work on Vercel & Local)
                 if (!uploadedUrl) {
                     try {
                         const arrayBuffer = await value.arrayBuffer();
                         const buffer = Buffer.from(arrayBuffer);
+                        const mimeType = value.type || 'image/jpeg';
+                        uploadedUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
-                        const timestamp = Date.now();
-                        const originalName = value.name.replace(/[^a-zA-Z0-9.-]/g, '');
-                        const filename = `${key}-${timestamp}-${originalName}`;
-
-                        const uploadDir = path.join(process.cwd(), "public", "uploads");
-                        await fs.mkdir(uploadDir, { recursive: true });
-
-                        const filepath = path.join(uploadDir, filename);
-                        await fs.writeFile(filepath, buffer);
-
-                        uploadedUrl = `/uploads/${filename}`;
+                        // Optionally save to local disk in development
+                        try {
+                            const timestamp = Date.now();
+                            const originalName = value.name.replace(/[^a-zA-Z0-9.-]/g, '');
+                            const filename = `${key}-${timestamp}-${originalName}`;
+                            const uploadDir = path.join(process.cwd(), "public", "uploads");
+                            await fs.mkdir(uploadDir, { recursive: true });
+                            await fs.writeFile(path.join(uploadDir, filename), buffer);
+                        } catch (e) {
+                            // Ignore disk write errors on serverless
+                        }
                     } catch (localError: any) {
-                        console.error(`[Settings Action] Local upload failed for ${key}:`, localError);
+                        console.error(`[Settings Action] Base64 processing failed for ${key}:`, localError);
                         throw new Error(`Gagal menyimpan file ${key}: ${localError.message}`);
                     }
                 }

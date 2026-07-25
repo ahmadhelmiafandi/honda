@@ -124,8 +124,7 @@ export function Hero({ settings, promotions = [] }: HeroProps) {
                                         fill
                                         className="object-cover object-center"
                                         priority={currentIndex === 0}
-                                        quality={95}
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1400px"
+                                        unoptimized
                                     />
                                 </Link>
                             ) : (
@@ -136,8 +135,7 @@ export function Hero({ settings, promotions = [] }: HeroProps) {
                                         fill
                                         className="object-cover object-center"
                                         priority={currentIndex === 0}
-                                        quality={95}
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1400px"
+                                        unoptimized
                                     />
                                 </div>
                             )}

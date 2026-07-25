@@ -141,7 +141,7 @@ export default function ContactClient({ settings }: ContactClientProps) {
                             <div className="flex gap-4 items-center">
                                 <div className="h-16 w-16 md:h-20 md:w-20 rounded-xl bg-slate-950 flex items-center justify-center shrink-0 shadow-xl overflow-hidden relative">
                                     {contactPhoto ? (
-                                        <Image src={contactPhoto} alt={contactName} fill className="object-cover" />
+                                        <Image src={contactPhoto} alt={contactName} fill className="object-cover" unoptimized />
                                     ) : (
                                         <User className="h-8 w-8 text-white" />
                                     )}
